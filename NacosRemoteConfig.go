@@ -30,10 +30,15 @@ func SetNacosOptions(params vo.NacosClientParam) {
 	defaultNacosOptions = params
 }
 
+func SetOnChangeCallback(f func()) {
+	onChangeCallback = f
+}
+
 var (
 	dataId string
 	group  string
 	defaultNacosOptions = vo.NacosClientParam{}
+	onChangeCallback func()
 )
 
 type nacosConfigManager struct {
@@ -64,6 +69,7 @@ func (n nacosConfigManager) Watch(appId string, stop chan bool) <-chan *viper.Re
 			Value: []byte(data),
 			Error: nil,
 		}
+		onChangeCallback()
 	}
 
 	err := n.nConfigClient.ListenConfig(params)

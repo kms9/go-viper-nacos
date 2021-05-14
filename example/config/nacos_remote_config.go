@@ -1,11 +1,13 @@
-package main
+package config
 
 import (
+	"fmt"
+	nacosRemote "github.com/kms9/go-viper-nacos"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/vo"
 	"github.com/silenceper/log"
 	"github.com/spf13/viper"
-	nacosRemote "github.com/kms9/go-viper-nacos"
+	"time"
 )
 
 var NacosConfig  *viper.Viper
@@ -26,12 +28,30 @@ var DefaultConfigMap = map[string]map[string]string{
 	},
 }
 
+var  SChan chan string
+
+func init()  {
+	SChan = make(chan string, 1)
+}
+
+
+func ReadChan()  {
+	for {
+		tmp := <-SChan
+		fmt.Println("已经执行了", tmp)
+	}
+}
+
+func SendChan()  {
+	SChan <- "TestKey:"+time.Now().String()
+}
+
 // StartLogger 初始日志
 func StartNacosConfig() error {
 	endpoint := "http://192.168.31.201:8848"
-	path := "qq-config"
-	tconfig:=DefaultConfigMap["208"]
-	NacosConfig  = viper.New()
+	path := ""
+	tconfig:= DefaultConfigMap["208"]
+	NacosConfig = viper.New()
 
 	var (
 		serverAdd 	= tconfig["serverAdd"]
@@ -70,6 +90,7 @@ func StartNacosConfig() error {
 
 	nacosRemote.SetDataID(dataId)
 	nacosRemote.SetGroup(group)
+	nacosRemote.SetOnChangeCallback(SendChan)
 
 	nacosRemote.SetNacosOptions(params)
 	NacosConfig.SetConfigType("yaml")

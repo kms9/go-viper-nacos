@@ -1,15 +1,16 @@
 package main
 
 import (
+	"fmt"
+	"github.com/kms9/go-viper-nacos/example/config"
 	"github.com/silenceper/log"
 	"os"
 	"os/signal"
 	"time"
-	"fmt"
 )
 
 func main()  {
-	err:=StartNacosConfig()
+	err:= config.StartNacosConfig()
 	if err!=nil{
 		log.Error("StartNacosConfig err:"+ err.Error())
 	}
@@ -17,6 +18,7 @@ func main()  {
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt,os.Kill)
 	go TestViper()
+	go config.ReadChan()
 	s := <-c
 	fmt.Println("stop,signal:",s)
 }
@@ -24,6 +26,6 @@ func main()  {
 func TestViper()  {
 	for {
 		time.Sleep(time.Second*5)
-		fmt.Println(NacosConfig.GetString("yc.cashApi.scene"))
+		fmt.Println(config.NacosConfig.GetString("yc.cashApi.scene"), time.Now().String())
 	}
 }
