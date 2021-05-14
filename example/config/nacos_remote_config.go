@@ -95,6 +95,10 @@ func StartNacosConfig() error {
 	nacosRemote.SetNacosOptions(params)
 	NacosConfig.SetConfigType("yaml")
 
+	tc:=nacosRemote.GetAllRemoteConfig()
+	_ = NacosConfig.MergeConfig(tc)
+
+
 	//Logger.Logger.Info("nacosRemote set config")
 
 	err:= NacosConfig.AddRemoteProvider("nacos", endpoint, path)

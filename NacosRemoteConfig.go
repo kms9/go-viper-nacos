@@ -11,6 +11,7 @@ import (
 	crypt "github.com/xordataexchange/crypt/config"
 	"io"
 	"os"
+	"strings"
 )
 
 var (
@@ -34,6 +35,12 @@ func SetOnChangeCallback(f func()) {
 	onChangeCallback = f
 }
 
+func GetAllRemoteConfig() *strings.Reader {
+	return allRemoteConfig
+}
+
+var allRemoteConfig *strings.Reader
+
 var (
 	dataId string
 	group  string
@@ -55,6 +62,8 @@ func (n nacosConfigManager) Get(path string) ([]byte, error) {
 		log.Error(err.Error())
 		return nil, err
 	}
+
+	allRemoteConfig = strings.NewReader(content)
 	return []byte(content), nil
 }
 
